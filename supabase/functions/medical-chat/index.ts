@@ -11,12 +11,20 @@ serve(async (req) => {
   }
 
   try {
-    const { messages } = await req.json();
+    const { messages, language = "english" } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
+
+    const languageInstructions: Record<string, string> = {
+      english: "Respond ONLY in English. Do not use any other language.",
+      hindi: "Respond ONLY in Hindi (हिंदी). Use Devanagari script. Do not use any other language.",
+      marathi: "Respond ONLY in Marathi (मराठी). Use Devanagari script. Do not use any other language.",
+      tamil: "Respond ONLY in Tamil (தமிழ்). Use Tamil script. Do not use any other language.",
+      telugu: "Respond ONLY in Telugu (తెలుగు). Use Telugu script. Do not use any other language.",
+    };
 
     const systemPrompt = `You are a helpful and compassionate medical health assistant. Your role is to:
 - Provide general health information and wellness advice
@@ -25,12 +33,13 @@ serve(async (req) => {
 - Answer questions about medications, treatments, and medical procedures in general terms
 - Support mental health and emotional well-being
 
+CRITICAL LANGUAGE INSTRUCTION: ${languageInstructions[language] || languageInstructions.english}
+
 IMPORTANT DISCLAIMERS you must follow:
 - Always remind users that you are an AI assistant and cannot replace professional medical advice
 - For serious symptoms or emergencies, always advise seeking immediate medical attention
 - Never diagnose conditions or prescribe medications
 - Encourage users to consult healthcare professionals for personalized medical advice
-- Be culturally sensitive and support both English and Hindi speakers
 
 Keep responses clear, concise, and empathetic. Use simple language that's easy to understand.`;
 

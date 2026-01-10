@@ -1,28 +1,54 @@
 import { useState, useRef, useEffect } from "react";
-import { Send, Bot, User, Loader2 } from "lucide-react";
+import { Send, Bot, User, Loader2, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface Message {
   role: "user" | "assistant";
   content: string;
 }
 
+type Language = "english" | "hindi" | "marathi" | "tamil" | "telugu";
+
+const LANGUAGES: { value: Language; label: string; greeting: string }[] = [
+  { value: "english", label: "English", greeting: "Hello! I'm your health assistant. How can I help you today?" },
+  { value: "hindi", label: "हिंदी (Hindi)", greeting: "नमस्ते! मैं आपका स्वास्थ्य सहायक हूं। मैं आज आपकी कैसे मदद कर सकता हूं?" },
+  { value: "marathi", label: "मराठी (Marathi)", greeting: "नमस्कार! मी तुमचा आरोग्य सहाय्यक आहे. आज मी तुम्हाला कशी मदत करू शकतो?" },
+  { value: "tamil", label: "தமிழ் (Tamil)", greeting: "வணக்கம்! நான் உங்கள் சுகாதார உதவியாளர். இன்று நான் உங்களுக்கு எப்படி உதவ முடியும்?" },
+  { value: "telugu", label: "తెలుగు (Telugu)", greeting: "నమస్కారం! నేను మీ ఆరోగ్య సహాయకుడిని. ఈరోజు నేను మీకు ఎలా సహాయం చేయగలను?" },
+];
+
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/medical-chat`;
 
 const ChatBox = () => {
+  const [language, setLanguage] = useState<Language>("english");
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "Hello! I'm your health assistant. How can I help you today?\n\nनमस्ते! मैं आपका स्वास्थ्य सहायक हूं। मैं आज आपकी कैसे मदद कर सकता हूं?",
+      content: LANGUAGES[0].greeting,
     },
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+
+  const handleLanguageChange = (newLanguage: Language) => {
+    setLanguage(newLanguage);
+    const langConfig = LANGUAGES.find((l) => l.value === newLanguage);
+    if (langConfig) {
+      setMessages([{ role: "assistant", content: langConfig.greeting }]);
+    }
+  };
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -48,7 +74,7 @@ const ChatBox = () => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
-        body: JSON.stringify({ messages: newMessages }),
+        body: JSON.stringify({ messages: newMessages, language }),
       });
 
       if (!response.ok || !response.body) {
@@ -128,14 +154,29 @@ const ChatBox = () => {
     <div className="flex flex-col w-full max-w-2xl mx-auto h-[60vh] bg-card rounded-2xl border border-border shadow-lg overflow-hidden">
       {/* Chat Header */}
       <div className="px-4 py-3 border-b border-border bg-muted/50">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-            <Bot className="w-4 h-4 text-primary" />
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+              <Bot className="w-4 h-4 text-primary" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-sm text-foreground">Medical Assistant</h3>
+              <p className="text-xs text-muted-foreground">Ask health questions</p>
+            </div>
           </div>
-          <div>
-            <h3 className="font-semibold text-sm text-foreground">Medical Assistant</h3>
-            <p className="text-xs text-muted-foreground">Ask health questions</p>
-          </div>
+          <Select value={language} onValueChange={(val) => handleLanguageChange(val as Language)}>
+            <SelectTrigger className="w-[140px] h-8 text-xs">
+              <Globe className="w-3 h-3 mr-1" />
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {LANGUAGES.map((lang) => (
+                <SelectItem key={lang.value} value={lang.value} className="text-xs">
+                  {lang.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
