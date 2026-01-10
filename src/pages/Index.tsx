@@ -1,7 +1,6 @@
 import { useState } from "react";
 import Header from "@/components/Header";
 import LanguageSelector from "@/components/LanguageSelector";
-import BottomNav from "@/components/BottomNav";
 import ElevenLabsWidget from "@/components/ElevenLabsWidget";
 import { useToast } from "@/hooks/use-toast";
 
@@ -21,13 +20,17 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Header with Emergency Button */}
-      <Header onEmergencyClick={handleEmergencyClick} />
+      {/* Header with Navigation & Emergency Button */}
+      <Header 
+        onEmergencyClick={handleEmergencyClick} 
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+      />
 
-      {/* Main Content - Minimal with widget as focus */}
-      <main className="flex-1 flex flex-col items-center pt-6 px-4">
-        {/* Language Selector - Compact */}
-        <div className="mb-3">
+      {/* Main Content */}
+      <main className="flex-1 flex flex-col items-center justify-center px-4">
+        {/* Language Selector */}
+        <div className="mb-4">
           <LanguageSelector
             selectedLanguage={selectedLanguage}
             onLanguageChange={setSelectedLanguage}
@@ -40,11 +43,8 @@ const Index = () => {
         </p>
       </main>
 
-      {/* ElevenLabs Widget - Fixed center via CSS */}
+      {/* ElevenLabs Widget - Bottom right default position */}
       <ElevenLabsWidget />
-
-      {/* Bottom Navigation */}
-      <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
     </div>
   );
 };
