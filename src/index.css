@@ -186,11 +186,11 @@
   }
 }
 
-/* ElevenLabs widget styling - make it prominent */
+/* ElevenLabs widget styling - always expanded centerpiece */
 elevenlabs-convai {
   --elevenlabs-convai-widget-z-index: 40;
-  position: fixed !important;
-  bottom: 100px !important;
-  right: 50% !important;
-  transform: translateX(50%) !important;
+  position: relative !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
 }

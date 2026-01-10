@@ -16,10 +16,10 @@ const ElevenLabsWidget = () => {
   }, []);
 
   return (
-    <>
+    <div className="w-full h-full flex items-center justify-center">
       {/* @ts-ignore - Custom element from ElevenLabs */}
       <elevenlabs-convai agent-id="agent_3901kek7045aes9rvnzgb880169r"></elevenlabs-convai>
-    </>
+    </div>
   );
 };
 
