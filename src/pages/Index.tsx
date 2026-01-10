@@ -1,130 +1,65 @@
 import { useState } from "react";
 import Header from "@/components/Header";
 import LanguageSelector from "@/components/LanguageSelector";
-import VoiceInput from "@/components/VoiceInput";
-import TextInput from "@/components/TextInput";
-import ActionButtons from "@/components/ActionButtons";
 import BottomNav from "@/components/BottomNav";
 import ElevenLabsWidget from "@/components/ElevenLabsWidget";
 import { useToast } from "@/hooks/use-toast";
 
-const placeholders: Record<string, string> = {
-  hi: "अपने लक्षण यहां लिखें...",
-  mr: "तुमची लक्षणे येथे लिहा...",
-  ta: "உங்கள் அறிகுறிகளை இங்கே எழுதுங்கள்...",
-  te: "మీ లక్షణాలను ఇక్కడ రాయండి...",
-  kn: "ನಿಮ್ಮ ಲಕ್ಷಣಗಳನ್ನು ಇಲ್ಲಿ ಬರೆಯಿರಿ...",
-  ml: "നിങ്ങളുടെ ലക്ഷണങ്ങൾ ഇവിടെ എഴുതുക...",
-  bn: "এখানে আপনার লক্ষণ লিখুন...",
-  gu: "તમારા લક્ષણો અહીં લખો...",
-  en: "Type your symptoms here...",
-};
-
 const Index = () => {
   const [selectedLanguage, setSelectedLanguage] = useState("hi");
-  const [isListening, setIsListening] = useState(false);
   const [activeTab, setActiveTab] = useState("home");
   const { toast } = useToast();
 
   const handleEmergencyClick = () => {
-    // In production, this would trigger a phone call
     toast({
       title: "Emergency Help",
       description: "Connecting to emergency helpline: 112",
       variant: "destructive",
     });
-    // Attempt to open phone dialer
     window.location.href = "tel:112";
   };
 
-  const handleVoiceClick = () => {
-    setIsListening(!isListening);
-    if (!isListening) {
-      toast({
-        title: "Voice Assistant Active",
-        description: "Speak clearly about your symptoms",
-      });
-    }
-  };
-
-  const handleTextSubmit = (text: string) => {
-    toast({
-      title: "Analyzing symptoms...",
-      description: text.substring(0, 50) + (text.length > 50 ? "..." : ""),
-    });
-    // In production, this would send to AI for analysis
-  };
-
-  const handleCheckSymptoms = () => {
-    toast({
-      title: "Symptom Checker",
-      description: "Opening symptom checker...",
-    });
-  };
-
-  const handleFindHospital = () => {
-    toast({
-      title: "Finding Nearby Hospitals",
-      description: "Locating healthcare facilities near you...",
-    });
-  };
-
-  const handleViewHistory = () => {
-    toast({
-      title: "Health History",
-      description: "Loading your health records...",
-    });
-  };
-
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Header with Emergency Button */}
       <Header onEmergencyClick={handleEmergencyClick} />
 
-      {/* Main Content */}
-      <main className="container py-6 space-y-8 animate-fade-in">
+      {/* Main Content - Centered Voice Agent */}
+      <main className="flex-1 flex flex-col items-center justify-center px-6 py-8">
         {/* Language Selector */}
-        <section className="flex justify-center">
+        <div className="mb-8">
           <LanguageSelector
             selectedLanguage={selectedLanguage}
             onLanguageChange={setSelectedLanguage}
           />
-        </section>
+        </div>
 
-        {/* Voice Input Section */}
-        <section className="bg-card rounded-3xl p-6 shadow-sm border border-border">
-          <VoiceInput
-            isListening={isListening}
-            onVoiceClick={handleVoiceClick}
-          />
+        {/* Voice Agent Prompt */}
+        <div className="text-center space-y-3 mb-12">
+          <h1 className="text-2xl font-semibold text-foreground">
+            Tap the button below to talk
+          </h1>
+          <p className="text-lg text-muted-foreground">
+            बोलने के लिए नीचे बटन दबाएं
+          </p>
+        </div>
 
-          {/* Divider */}
-          <div className="flex items-center gap-4 my-6">
-            <div className="flex-1 h-px bg-border" />
-            <span className="text-sm text-muted-foreground px-2">
-              or type below
-            </span>
-            <div className="flex-1 h-px bg-border" />
-          </div>
-
-          {/* Text Input */}
-          <TextInput
-            placeholder={placeholders[selectedLanguage] || placeholders.en}
-            onSubmit={handleTextSubmit}
-          />
-        </section>
-
-        {/* Action Buttons */}
-        <section className="space-y-4">
-          <h2 className="text-lg font-semibold text-muted-foreground px-1">
-            Quick Actions
-          </h2>
-          <ActionButtons
-            onCheckSymptoms={handleCheckSymptoms}
-            onFindHospital={handleFindHospital}
-            onViewHistory={handleViewHistory}
-          />
-        </section>
+        {/* Visual indicator pointing to widget */}
+        <div className="flex flex-col items-center text-muted-foreground">
+          <svg
+            className="w-8 h-8 animate-bounce"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 14l-7 7m0 0l-7-7m7 7V3"
+            />
+          </svg>
+        </div>
       </main>
 
       {/* Bottom Navigation */}
