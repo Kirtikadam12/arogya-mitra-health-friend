@@ -29,17 +29,19 @@ const Index = () => {
       />
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col items-center py-4 px-4 pb-24">
+      <main className="flex-1 flex flex-col items-center py-3 sm:py-4 px-3 sm:px-4 md:px-6 lg:px-8 xl:px-12 pb-20 sm:pb-24 pr-0 md:pr-56 lg:pr-72 xl:pr-80 2xl:pr-96">
         {/* Language Selector */}
-        <div className="mb-4">
+        <div className="mb-3 sm:mb-4 w-full max-w-4xl xl:max-w-5xl 2xl:max-w-6xl">
           <LanguageSelector
             selectedLanguage={selectedLanguage}
             onLanguageChange={setSelectedLanguage}
           />
         </div>
 
-        {/* Chat Box */}
-        <ChatBox />
+        {/* Chat Box - Centered with space for ElevenLabs widget on the right */}
+        <div className="w-full max-w-full sm:max-w-2xl md:max-w-3xl lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl px-0">
+          <ChatBox />
+        </div>
       </main>
 
       {/* ElevenLabs Widget - Bottom right default position */}

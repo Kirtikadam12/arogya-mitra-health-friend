@@ -210,41 +210,41 @@ const ChatBox = () => {
   };
 
   return (
-    <div className="flex flex-col w-full max-w-2xl mx-auto mr-24 h-[65vh] bg-card rounded-2xl border border-border shadow-lg overflow-hidden">
+    <div className="flex flex-col w-full h-[calc(100vh-12rem)] sm:h-[calc(100vh-10rem)] md:h-[75vh] lg:h-[70vh] xl:h-[68vh] 2xl:h-[65vh] bg-card rounded-2xl border border-border shadow-lg overflow-hidden">
       {/* Chat Header */}
-      <div className="px-4 py-3 border-b border-border bg-muted/50">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-              <Bot className="w-4 h-4 text-primary" />
+      <div className="px-3 py-2 sm:px-4 sm:py-2.5 md:px-5 md:py-3 border-b border-border bg-muted/50">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+            <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+              <Bot className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-primary" />
             </div>
-            <div>
-              <h3 className="font-semibold text-sm text-foreground">Medical Assistant</h3>
-              <p className="text-xs text-muted-foreground">
+            <div className="min-w-0">
+              <h3 className="font-semibold text-[10px] sm:text-xs text-foreground truncate">Medical Assistant</h3>
+              <p className="text-[9px] sm:text-[10px] text-muted-foreground truncate">
                 {user ? "Chat history saved" : "Sign in to save history"}
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             {user && (
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8"
+                className="h-6 w-6 sm:h-7 sm:w-7"
                 onClick={handleClearHistory}
                 title="Clear chat history"
               >
-                <Trash2 className="w-4 h-4" />
+                <Trash2 className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
               </Button>
             )}
             <Select value={language} onValueChange={(val) => handleLanguageChange(val as Language)}>
-              <SelectTrigger className="w-[140px] h-8 text-xs">
-                <Globe className="w-3 h-3 mr-1" />
+              <SelectTrigger className="w-[110px] sm:w-[120px] md:w-[130px] h-6 sm:h-7 text-[10px] sm:text-[11px]">
+                <Globe className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-1" />
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 {LANGUAGES.map((lang) => (
-                  <SelectItem key={lang.value} value={lang.value} className="text-xs">
+                  <SelectItem key={lang.value} value={lang.value} className="text-[10px] sm:text-[11px]">
                     {lang.label}
                   </SelectItem>
                 ))}
@@ -255,46 +255,46 @@ const ChatBox = () => {
       </div>
 
       {/* Messages */}
-      <ScrollArea className="flex-1 p-4" ref={scrollRef}>
+      <ScrollArea className="flex-1 p-3 sm:p-4 md:p-5" ref={scrollRef}>
         {isLoadingHistory ? (
           <div className="flex items-center justify-center h-full">
-            <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+            <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin text-muted-foreground" />
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-2 sm:space-y-3">
             {messages.map((message, index) => (
               <div
                 key={index}
-                className={`flex gap-3 ${message.role === "user" ? "justify-end" : "justify-start"}`}
+                className={`flex gap-2 sm:gap-3 ${message.role === "user" ? "justify-end" : "justify-start"}`}
               >
                 {message.role === "assistant" && (
-                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                    <Bot className="w-4 h-4 text-primary" />
+                  <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                    <Bot className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-primary" />
                   </div>
                 )}
                 <div
-                  className={`max-w-[80%] rounded-2xl px-4 py-2.5 ${
+                  className={`max-w-[85%] sm:max-w-[80%] md:max-w-[75%] lg:max-w-[70%] xl:max-w-[65%] rounded-2xl px-3 py-2 sm:px-4 sm:py-2.5 ${
                     message.role === "user"
                       ? "bg-primary text-primary-foreground"
                       : "bg-muted text-foreground"
                   }`}
                 >
-                  <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                  <p className="text-[11px] sm:text-xs leading-relaxed whitespace-pre-wrap break-words">{message.content}</p>
                 </div>
                 {message.role === "user" && (
-                  <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center shrink-0">
-                    <User className="w-4 h-4 text-secondary-foreground" />
+                  <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-secondary flex items-center justify-center shrink-0">
+                    <User className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-secondary-foreground" />
                   </div>
                 )}
               </div>
             ))}
             {isLoading && messages[messages.length - 1]?.content === "" && (
-              <div className="flex gap-3 justify-start">
-                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                  <Loader2 className="w-4 h-4 text-primary animate-spin" />
+              <div className="flex gap-2 sm:gap-3 justify-start">
+                <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                  <Loader2 className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-primary animate-spin" />
                 </div>
-                <div className="bg-muted rounded-2xl px-4 py-2.5">
-                  <p className="text-sm text-muted-foreground">Thinking...</p>
+                <div className="bg-muted rounded-2xl px-3 py-2 sm:px-4 sm:py-2.5">
+                  <p className="text-[11px] sm:text-xs text-muted-foreground">Thinking...</p>
                 </div>
               </div>
             )}
@@ -303,30 +303,30 @@ const ChatBox = () => {
       </ScrollArea>
 
       {/* Input */}
-      <div className="p-4 border-t border-border bg-background">
+      <div className="p-3 sm:p-4 md:p-5 border-t border-border bg-background">
         <div className="flex gap-2">
           <Textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Type your health question..."
-            className="min-h-[44px] max-h-32 resize-none"
+            className="min-h-[38px] sm:min-h-[42px] max-h-32 resize-none text-[11px] sm:text-xs"
             disabled={isLoading}
           />
           <Button
             onClick={sendMessage}
             disabled={!input.trim() || isLoading}
             size="icon"
-            className="shrink-0 h-11 w-11"
+            className="shrink-0 h-[38px] w-[38px] sm:h-[42px] sm:w-[42px]"
           >
             {isLoading ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
+              <Loader2 className="w-3 h-3 sm:w-3.5 sm:h-3.5 animate-spin" />
             ) : (
-              <Send className="w-4 h-4" />
+              <Send className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
             )}
           </Button>
         </div>
-        <p className="text-xs text-muted-foreground mt-2 text-center">
+        <p className="text-[9px] sm:text-[10px] text-muted-foreground mt-1.5 sm:mt-2 text-center">
           ⚠️ This is not a substitute for professional medical advice
         </p>
       </div>
