@@ -24,10 +24,10 @@ const Index = () => {
       {/* Header with Emergency Button */}
       <Header onEmergencyClick={handleEmergencyClick} />
 
-      {/* Main Content - Voice Agent as Centerpiece */}
-      <main className="flex-1 flex flex-col items-center justify-center px-4 py-6">
+      {/* Main Content - Minimal with widget as focus */}
+      <main className="flex-1 flex flex-col items-center pt-6 px-4">
         {/* Language Selector - Compact */}
-        <div className="mb-4">
+        <div className="mb-3">
           <LanguageSelector
             selectedLanguage={selectedLanguage}
             onLanguageChange={setSelectedLanguage}
@@ -35,15 +35,13 @@ const Index = () => {
         </div>
 
         {/* Simple prompt text */}
-        <p className="text-center text-muted-foreground text-base mb-6">
+        <p className="text-center text-muted-foreground text-base">
           Tap to talk • बोलने के लिए दबाएं
         </p>
-
-        {/* ElevenLabs Widget - The Centerpiece */}
-        <div className="flex-1 flex items-center justify-center w-full max-w-md">
-          <ElevenLabsWidget />
-        </div>
       </main>
+
+      {/* ElevenLabs Widget - Fixed center via CSS */}
+      <ElevenLabsWidget />
 
       {/* Bottom Navigation */}
       <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
