@@ -1,5 +1,6 @@
 import { Phone, Heart, Home, History, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import PhoneAuth from "@/components/PhoneAuth";
 
 interface HeaderProps {
   onEmergencyClick: () => void;
@@ -49,6 +50,11 @@ const Header = ({ onEmergencyClick, activeTab, onTabChange }: HeaderProps) => {
             </button>
           ))}
         </nav>
+
+        {/* Phone Auth */}
+        <div className="hidden md:block">
+          <PhoneAuth />
+        </div>
 
         {/* Emergency Button */}
         <Button

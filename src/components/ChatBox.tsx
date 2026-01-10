@@ -1,9 +1,11 @@
-import { useState, useRef, useEffect } from "react";
-import { Send, Bot, User, Loader2, Globe } from "lucide-react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { Send, Bot, User, Loader2, Globe, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
+import { useChatHistory } from "@/hooks/useChatHistory";
 import {
   Select,
   SelectContent,
@@ -31,12 +33,14 @@ const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/medical-chat
 
 const ChatBox = () => {
   const [language, setLanguage] = useState<Language>("english");
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      role: "assistant",
-      content: LANGUAGES[0].greeting,
-    },
-  ]);
+  const langConfig = LANGUAGES.find((l) => l.value === language) || LANGUAGES[0];
+  
+  const { user } = useAuth();
+  const { messages, setMessages, saveMessage, clearHistory, isLoadingHistory } = useChatHistory(
+    language,
+    langConfig.greeting
+  );
+  
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -44,10 +48,6 @@ const ChatBox = () => {
 
   const handleLanguageChange = (newLanguage: Language) => {
     setLanguage(newLanguage);
-    const langConfig = LANGUAGES.find((l) => l.value === newLanguage);
-    if (langConfig) {
-      setMessages([{ role: "assistant", content: langConfig.greeting }]);
-    }
   };
 
   useEffect(() => {
@@ -64,6 +64,11 @@ const ChatBox = () => {
     setMessages(newMessages);
     setInput("");
     setIsLoading(true);
+
+    // Save user message if logged in
+    if (user) {
+      saveMessage(userMessage);
+    }
 
     let assistantContent = "";
 
@@ -127,6 +132,11 @@ const ChatBox = () => {
           }
         }
       }
+
+      // Save assistant message if logged in
+      if (user && assistantContent) {
+        saveMessage({ role: "assistant", content: assistantContent });
+      }
     } catch (error) {
       console.error("Chat error:", error);
       toast({
@@ -150,6 +160,14 @@ const ChatBox = () => {
     }
   };
 
+  const handleClearHistory = async () => {
+    await clearHistory();
+    toast({
+      title: "Chat cleared",
+      description: "Your conversation history has been cleared",
+    });
+  };
+
   return (
     <div className="flex flex-col w-full max-w-2xl mx-auto mr-24 h-[65vh] bg-card rounded-2xl border border-border shadow-lg overflow-hidden">
       {/* Chat Header */}
@@ -161,65 +179,86 @@ const ChatBox = () => {
             </div>
             <div>
               <h3 className="font-semibold text-sm text-foreground">Medical Assistant</h3>
-              <p className="text-xs text-muted-foreground">Ask health questions</p>
+              <p className="text-xs text-muted-foreground">
+                {user ? "Chat history saved" : "Sign in to save history"}
+              </p>
             </div>
           </div>
-          <Select value={language} onValueChange={(val) => handleLanguageChange(val as Language)}>
-            <SelectTrigger className="w-[140px] h-8 text-xs">
-              <Globe className="w-3 h-3 mr-1" />
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {LANGUAGES.map((lang) => (
-                <SelectItem key={lang.value} value={lang.value} className="text-xs">
-                  {lang.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="flex items-center gap-2">
+            {user && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                onClick={handleClearHistory}
+                title="Clear chat history"
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            )}
+            <Select value={language} onValueChange={(val) => handleLanguageChange(val as Language)}>
+              <SelectTrigger className="w-[140px] h-8 text-xs">
+                <Globe className="w-3 h-3 mr-1" />
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {LANGUAGES.map((lang) => (
+                  <SelectItem key={lang.value} value={lang.value} className="text-xs">
+                    {lang.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </div>
 
       {/* Messages */}
       <ScrollArea className="flex-1 p-4" ref={scrollRef}>
-        <div className="space-y-4">
-          {messages.map((message, index) => (
-            <div
-              key={index}
-              className={`flex gap-3 ${message.role === "user" ? "justify-end" : "justify-start"}`}
-            >
-              {message.role === "assistant" && (
-                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                  <Bot className="w-4 h-4 text-primary" />
-                </div>
-              )}
+        {isLoadingHistory ? (
+          <div className="flex items-center justify-center h-full">
+            <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {messages.map((message, index) => (
               <div
-                className={`max-w-[80%] rounded-2xl px-4 py-2.5 ${
-                  message.role === "user"
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted text-foreground"
-                }`}
+                key={index}
+                className={`flex gap-3 ${message.role === "user" ? "justify-end" : "justify-start"}`}
               >
-                <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-              </div>
-              {message.role === "user" && (
-                <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center shrink-0">
-                  <User className="w-4 h-4 text-secondary-foreground" />
+                {message.role === "assistant" && (
+                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                    <Bot className="w-4 h-4 text-primary" />
+                  </div>
+                )}
+                <div
+                  className={`max-w-[80%] rounded-2xl px-4 py-2.5 ${
+                    message.role === "user"
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted text-foreground"
+                  }`}
+                >
+                  <p className="text-sm whitespace-pre-wrap">{message.content}</p>
                 </div>
-              )}
-            </div>
-          ))}
-          {isLoading && messages[messages.length - 1]?.content === "" && (
-            <div className="flex gap-3 justify-start">
-              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                <Loader2 className="w-4 h-4 text-primary animate-spin" />
+                {message.role === "user" && (
+                  <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center shrink-0">
+                    <User className="w-4 h-4 text-secondary-foreground" />
+                  </div>
+                )}
               </div>
-              <div className="bg-muted rounded-2xl px-4 py-2.5">
-                <p className="text-sm text-muted-foreground">Thinking...</p>
+            ))}
+            {isLoading && messages[messages.length - 1]?.content === "" && (
+              <div className="flex gap-3 justify-start">
+                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                  <Loader2 className="w-4 h-4 text-primary animate-spin" />
+                </div>
+                <div className="bg-muted rounded-2xl px-4 py-2.5">
+                  <p className="text-sm text-muted-foreground">Thinking...</p>
+                </div>
               </div>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        )}
       </ScrollArea>
 
       {/* Input */}
