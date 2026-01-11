@@ -1,5 +1,6 @@
 import { Phone, Heart, Home, History, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import EmailAuth from "@/components/EmailAuth";
 
 interface HeaderProps {
   onEmergencyClick: () => void;
@@ -50,16 +51,24 @@ const Header = ({ onEmergencyClick, activeTab, onTabChange }: HeaderProps) => {
           ))}
         </nav>
 
-        {/* Emergency Button */}
-        <Button
-          variant="emergency"
-          size="sm"
-          onClick={onEmergencyClick}
-          className="gap-1.5 shrink-0"
-        >
-          <Phone className="w-4 h-4" />
-          <span className="hidden sm:inline">Emergency</span>
-        </Button>
+        {/* Auth & Emergency */}
+        <div className="flex items-center gap-2">
+          {/* Email Authentication */}
+          <div className="hidden md:block">
+            <EmailAuth />
+          </div>
+
+          {/* Emergency Button */}
+          <Button
+            variant="emergency"
+            size="sm"
+            onClick={onEmergencyClick}
+            className="gap-1.5 shrink-0"
+          >
+            <Phone className="w-4 h-4" />
+            <span className="hidden sm:inline">Emergency</span>
+          </Button>
+        </div>
       </div>
     </header>
   );

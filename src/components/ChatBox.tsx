@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import { useChatHistory } from "@/hooks/useChatHistory";
 import {
   Select,
@@ -56,7 +57,8 @@ const ChatBox = () => {
   const [language, setLanguage] = useState<Language>("english");
   const langConfig = LANGUAGES.find((l) => l.value === language) || LANGUAGES[0];
   
-  const { messages, setMessages, isLoadingHistory } = useChatHistory(
+  const { user } = useAuth();
+  const { messages, setMessages, saveMessage, isLoadingHistory } = useChatHistory(
     language,
     langConfig.greeting
   );
@@ -92,6 +94,11 @@ const ChatBox = () => {
     setInput("");
     setIsLoading(true);
 
+    // Save user message if logged in
+    if (user) {
+      saveMessage(userMessage);
+    }
+
     let assistantContent = "";
 
     // If API is not configured, use mock response
@@ -100,7 +107,12 @@ const ChatBox = () => {
       
       // Simulate API delay and add mock response
       setTimeout(() => {
-        setMessages((prev) => [...prev, { role: "assistant", content: mockResponse }]);
+        const assistantMsg = { role: "assistant" as const, content: mockResponse };
+        setMessages((prev) => [...prev, assistantMsg]);
+        // Save assistant message if logged in
+        if (user) {
+          saveMessage(assistantMsg);
+        }
         setIsLoading(false);
       }, 500);
       return;
@@ -167,6 +179,10 @@ const ChatBox = () => {
         }
       }
 
+      // Save assistant message if logged in
+      if (user && assistantContent) {
+        saveMessage({ role: "assistant", content: assistantContent });
+      }
     } catch (error) {
       console.error("Chat error:", error);
       toast({
@@ -203,7 +219,7 @@ const ChatBox = () => {
             <div className="min-w-0">
               <h3 className="font-semibold text-[10px] sm:text-xs text-foreground truncate">Medical Assistant</h3>
               <p className="text-[9px] sm:text-[10px] text-muted-foreground truncate">
-                Ask your health questions
+                {user ? "Chat history saved" : "Sign in to save history"}
               </p>
             </div>
           </div>
