@@ -5,6 +5,7 @@ import { useAuth } from "./useAuth";
 interface Message {
   role: "user" | "assistant";
   content: string;
+  image_url?: string;
 }
 
 export const useChatHistory = (language: string, defaultGreeting: string) => {
@@ -26,7 +27,7 @@ export const useChatHistory = (language: string, defaultGreeting: string) => {
       try {
         const { data, error } = await supabase
           .from("chat_history")
-          .select("role, content")
+          .select("role, content, image_url")
           .eq("user_id", user.id)
           .eq("language", language)
           .order("created_at", { ascending: true });
@@ -39,7 +40,8 @@ export const useChatHistory = (language: string, defaultGreeting: string) => {
         if (data && data.length > 0) {
           setMessages(data.map(msg => ({ 
             role: msg.role as "user" | "assistant", 
-            content: msg.content 
+            content: msg.content,
+            image_url: msg.image_url || undefined
           })));
         } else {
           setMessages([{ role: "assistant", content: defaultGreeting }]);
@@ -64,6 +66,7 @@ export const useChatHistory = (language: string, defaultGreeting: string) => {
         role: message.role,
         content: message.content,
         language,
+        image_url: message.image_url || null,
       });
     } catch (err) {
       console.error("Error saving message:", err);

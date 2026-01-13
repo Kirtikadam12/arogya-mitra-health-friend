@@ -3,11 +3,13 @@ import Header from "@/components/Header";
 import LanguageSelector from "@/components/LanguageSelector";
 import ElevenLabsWidget from "@/components/ElevenLabsWidget";
 import ChatBox from "@/components/ChatBox";
+import NearbyHospitals from "@/components/NearbyHospitals";
 import { useToast } from "@/hooks/use-toast";
 
 const Index = () => {
   const [selectedLanguage, setSelectedLanguage] = useState("hi");
   const [activeTab, setActiveTab] = useState("home");
+  const [showHospitals, setShowHospitals] = useState(false);
   const { toast } = useToast();
 
   const handleEmergencyClick = () => {
@@ -27,6 +29,7 @@ const Index = () => {
         onEmergencyClick={handleEmergencyClick}
         activeTab={activeTab}
         onTabChange={setActiveTab}
+        onHospitalsClick={() => setShowHospitals(true)}
       />
 
       {/* Main Content */}
@@ -47,6 +50,12 @@ const Index = () => {
 
       {/* ElevenLabs Widget - Bottom right default position */}
       <ElevenLabsWidget />
+
+      {/* Nearby Hospitals Dialog */}
+      <NearbyHospitals 
+        isOpen={showHospitals} 
+        onOpenChange={setShowHospitals} 
+      />
     </div>
   );
 };

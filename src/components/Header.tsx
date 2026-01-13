@@ -1,4 +1,4 @@
-import { Phone, Heart, Home, History, HelpCircle } from "lucide-react";
+import { Phone, Heart, Home, History, HelpCircle, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import EmailAuth from "@/components/EmailAuth";
 
@@ -6,9 +6,10 @@ interface HeaderProps {
   onEmergencyClick: () => void;
   activeTab: string;
   onTabChange: (tab: string) => void;
+  onHospitalsClick?: () => void;
 }
 
-const Header = ({ onEmergencyClick, activeTab, onTabChange }: HeaderProps) => {
+const Header = ({ onEmergencyClick, activeTab, onTabChange, onHospitalsClick }: HeaderProps) => {
   const navItems = [
     { icon: Home, label: "Home", id: "home" },
     { icon: History, label: "History", id: "history" },
@@ -51,12 +52,25 @@ const Header = ({ onEmergencyClick, activeTab, onTabChange }: HeaderProps) => {
           ))}
         </nav>
 
-        {/* Auth & Emergency */}
+        {/* Auth & Actions */}
         <div className="flex items-center gap-2">
           {/* Email Authentication */}
           <div className="hidden md:block">
             <EmailAuth />
           </div>
+
+          {/* Nearby Hospitals Button */}
+          {onHospitalsClick && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onHospitalsClick}
+              className="gap-1.5 shrink-0 hidden sm:flex"
+            >
+              <MapPin className="w-4 h-4" />
+              <span className="hidden md:inline">Hospitals</span>
+            </Button>
+          )}
 
           {/* Emergency Button */}
           <Button
